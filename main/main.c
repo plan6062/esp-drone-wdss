@@ -265,19 +265,19 @@ void app_main()
 
             switch(test_count % 4) {
                 case 0:
-                    printf("RED LED + 10% Motors\n");
+                    printf("RED LED + 10%% Motors\n");
                     ledClearAll();
                     ledSet(LED_RED, true);
                     set_motor_speed(10);
                     break;
                 case 1:
-                    printf("GREEN LED + 20% Motors\n");
+                    printf("GREEN LED + 20%% Motors\n");
                     ledClearAll();
                     ledSet(LED_GREEN, true);
                     set_motor_speed(20);
                     break;
                 case 2:
-                    printf("BLUE LED + 30% Motors\n");
+                    printf("BLUE LED + 30%% Motors\n");
                     ledClearAll();
                     ledSet(LED_BLUE, true);
                     set_motor_speed(30);

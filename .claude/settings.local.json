@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/DroneShow/GCSServer/**)",
-      "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/WDSS-web/**)"
+      "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/WDSS-web/**)",
+      "Bash(idf.py build:*)"
     ],
     "deny": [],
     "ask": []

@@ -72,7 +72,7 @@
 #include "static_mem.h"
 //#include "peer_localization.h"
 #include "cfassert.h"
-#include "gcs_comm.h"
+//#include "gcs_comm.h"
 
 #ifndef START_DISARMED
 #define ARM_INIT true
