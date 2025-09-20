@@ -85,7 +85,7 @@ void assertFail(char *exp, char *file, int line)
   ledClearAll();
   ledSet(ERR_LED1, 1);
   //ledSet(ERR_LED2, 1);
-  powerStop();
+  // powerStop();
 
   while (1);
 }

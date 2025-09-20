@@ -29,8 +29,8 @@
 
 #include "stm32_legacy.h"
 #include "motors.h"
-#include "pm_esplane.h"
-#include "log.h"
+// #include "pm_esplane.h"
+// #include "log.h"
 #define DEBUG_MODULE "MOTORS"
 #include "debug_cf.h"
 
@@ -262,9 +262,9 @@ void motorsPlayMelody(uint16_t *notes)
       motorsPlayTone(note, duration);
     } while (duration != 0);
 }
-LOG_GROUP_START(pwm)
-LOG_ADD(LOG_UINT32, m1_pwm, &motor_ratios[0])
-LOG_ADD(LOG_UINT32, m2_pwm, &motor_ratios[1])
-LOG_ADD(LOG_UINT32, m3_pwm, &motor_ratios[2])
-LOG_ADD(LOG_UINT32, m4_pwm, &motor_ratios[3])
-LOG_GROUP_STOP(pwm)
+// LOG_GROUP_START(pwm)
+// LOG_ADD(LOG_UINT32, m1_pwm, &motor_ratios[0])
+// LOG_ADD(LOG_UINT32, m2_pwm, &motor_ratios[1])
+// LOG_ADD(LOG_UINT32, m3_pwm, &motor_ratios[2])
+// LOG_ADD(LOG_UINT32, m4_pwm, &motor_ratios[3])
+// LOG_GROUP_STOP(pwm)

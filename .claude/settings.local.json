@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/DroneShow/GCSServer/**)",
+      "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/WDSS-web/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

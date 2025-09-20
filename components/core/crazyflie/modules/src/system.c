@@ -34,11 +34,11 @@
 
 #include "version.h"
 #include "config.h"
-#include "param.h"
-#include "log.h"
+// #include "param.h"
+// #include "log.h"
 #include "ledseq.h"
-#include "adc_esp32.h"
-#include "pm_esplane.h"
+// #include "adc_esp32.h"
+// #include "pm_esplane.h"
 #include "config.h"
 #include "system.h"
 #include "platform.h"
@@ -50,19 +50,19 @@
 //#include "uart1.h"
 //#include "uart2.h"
 #include "wifi_esp32.h"
-#include "comm.h"
-#include "stabilizer.h"
-#include "commander.h"
+// #include "comm.h"
+// #include "stabilizer.h"
+// #include "commander.h"
 #include "console.h"
 #include "wifilink.h"
 #include "mem.h"
 //#include "proximity.h"
 //#include "watchdog.h"
-#include "queuemonitor.h"
-#include "buzzer.h"
-#include "sound.h"
-#include "sysload.h"
-#include "estimator_kalman.h"
+// #include "queuemonitor.h"
+// #include "buzzer.h"
+// #include "sound.h"
+// #include "sysload.h"
+// #include "estimator_kalman.h"
 //#include "deck.h"
 //#include "extrx.h"
 #include "app.h"
@@ -72,6 +72,7 @@
 #include "static_mem.h"
 //#include "peer_localization.h"
 #include "cfassert.h"
+#include "gcs_comm.h"
 
 #ifndef START_DISARMED
 #define ARM_INIT true
@@ -113,13 +114,13 @@ void systemInit(void)
   canStartMutex = xSemaphoreCreateMutexStatic(&canStartMutexBuffer);
   xSemaphoreTake(canStartMutex, portMAX_DELAY);
 
-  wifilinkInit();
-  sysLoadInit();
+  // wifilinkInit();
+  // sysLoadInit();
 
   /* Initialized here so that DEBUG_PRINT (buffered) can be used early */
   debugInit();
-  crtpInit();
-  consoleInit();
+  // crtpInit();
+  // consoleInit();
 
   /* DEBUG_PRINT("----------------------------\n");
   DEBUG_PRINT("%s is up and running!\n", platformConfigGetDeviceTypeName());
@@ -134,17 +135,17 @@ void systemInit(void)
               *((int*)(MCU_ID_ADDRESS+8)), *((int*)(MCU_ID_ADDRESS+4)),
               *((int*)(MCU_ID_ADDRESS+0)), *((short*)(MCU_FLASH_SIZE_ADDRESS)));*/
 
-  configblockInit();
+  // configblockInit();
   //storageInit();
-  workerInit();
-  adcInit();
-  ledseqInit();
-  pmInit();
-  buzzerInit();
+  // workerInit();
+  // adcInit();
+  // ledseqInit();
+  // pmInit();
+  // buzzerInit();
 //  peerLocalizationInit();
 
 #ifdef APP_ENABLED
-  appInit();
+  // appInit();
 #endif
 
   isInit = true;
@@ -154,12 +155,12 @@ bool systemTest()
 {
   bool pass=isInit;
 
-  pass &= ledseqTest();
-  pass &= pmTest();
+  // pass &= ledseqTest();
+  // pass &= pmTest();
   DEBUG_PRINTI("pmTest = %d", pass);
-  pass &= workerTest();
-  DEBUG_PRINTI("workerTest = %d", pass);
-  pass &= buzzerTest();
+  // pass &= workerTest();
+  // DEBUG_PRINTI("workerTest = %d", pass);
+  // pass &= buzzerTest();
   return pass;
 }
 
@@ -169,9 +170,9 @@ void systemTask(void *arg)
 {
   bool pass = true;
 
-  ledInit();
-  ledSet(CHG_LED, 1);
-  wifiInit();
+  // ledInit();
+  // ledSet(CHG_LED, 1);
+  // wifiInit();  // 기존 AP 모드 비활성화 - GCS WebSocket 사용
   vTaskDelay(M2T(500));
 
 #ifdef DEBUG_QUEUE_MONITOR
@@ -187,45 +188,46 @@ void systemTask(void *arg)
 
   //Init the high-levels modules
   systemInit();
-  commInit();
-  commanderInit();
+  // commInit();
+  // commanderInit();
 
-  StateEstimatorType estimator = anyEstimator;
-  estimatorKalmanTaskInit();
+  // StateEstimatorType estimator = anyEstimator;
+  // estimatorKalmanTaskInit();
   //deckInit();
   //estimator = deckGetRequiredEstimator();
-  stabilizerInit(estimator);
+  // stabilizerInit(estimator);
   //if (deckGetRequiredLowInterferenceRadioMode() && platformConfigPhysicalLayoutAntennasAreClose())
   //{
   //  platformSetLowInterferenceRadioMode();
   //}
-  soundInit();
-  memInit();
+  // soundInit();
+  // memInit();
+  // gcs_comm_init();
 
 #ifdef PROXIMITY_ENABLED
   proximityInit();
 #endif
 
 	/* Test each modules */
-  pass &= wifiTest();
-  DEBUG_PRINTI("wifilinkTest = %d ", pass);
+  // pass &= wifiTest();  // 기존 WiFi 테스트 비활성화 - GCS WebSocket 사용
+  // DEBUG_PRINTI("wifilinkTest = %d ", pass);
   pass &= systemTest();
   DEBUG_PRINTI("systemTest = %d ", pass);
-  pass &= configblockTest();
-  DEBUG_PRINTI("configblockTest = %d ", pass);
+  // pass &= configblockTest();
+  // DEBUG_PRINTI("configblockTest = %d ", pass);
   //pass &= storageTest();
-  pass &= commTest();
-  DEBUG_PRINTI("commTest = %d ", pass);
-  pass &= commanderTest();
-  DEBUG_PRINTI("commanderTest = %d ", pass);
-  pass &= stabilizerTest();
-  DEBUG_PRINTI("stabilizerTest = %d ", pass);
-  pass &= estimatorKalmanTaskTest();
-  DEBUG_PRINTI("estimatorKalmanTaskTest = %d ", pass);
+  // pass &= commTest();
+  // DEBUG_PRINTI("commTest = %d ", pass);
+  // pass &= commanderTest();
+  // DEBUG_PRINTI("commanderTest = %d ", pass);
+  // pass &= stabilizerTest();
+  // DEBUG_PRINTI("stabilizerTest = %d ", pass);
+  // pass &= estimatorKalmanTaskTest();
+  // DEBUG_PRINTI("estimatorKalmanTaskTest = %d ", pass);
   //pass &= deckTest();
-  pass &= soundTest();
-  DEBUG_PRINTI("soundTest = %d ", pass);
-  pass &= memTest();
+  // pass &= soundTest();
+  // DEBUG_PRINTI("soundTest = %d ", pass);
+  // pass &= memTest();
   DEBUG_PRINTI("memTest = %d ", pass);
   //pass &= watchdogNormalStartTest();
   pass &= cfAssertNormalStartTest();
@@ -237,9 +239,10 @@ void systemTask(void *arg)
     selftestPassed = 1;
     systemStart();
     DEBUG_PRINTI("systemStart ! selftestPassed = %d", selftestPassed);
-    soundSetEffect(SND_STARTUP);
-    ledseqRun(&seq_alive);
-    ledseqRun(&seq_testPassed);
+    // gcs_comm_start();
+    // soundSetEffect(SND_STARTUP);
+    // ledseqRun(&seq_alive);
+    // ledseqRun(&seq_testPassed);
   }
   else
   {
@@ -248,7 +251,7 @@ void systemTask(void *arg)
     {
       while(1)
       {
-        ledseqRun(&seq_testFailed);
+        // ledseqRun(&seq_testFailed);
         vTaskDelay(M2T(2000));
         // System can be forced to start by setting the param to 1 from the cfclient
         if (selftestPassed)
@@ -261,13 +264,13 @@ void systemTask(void *arg)
     }
     else
     {
-      ledInit();
-      ledSet(SYS_LED, true);
+      // ledInit();
+      // ledSet(SYS_LED, true);
     }
   }
   DEBUG_PRINT("Free heap: %"PRIu32" bytes\n", xPortGetFreeHeapSize());
 
-  workerLoop();
+  // workerLoop();
 
   //Should never reach this point!
   while(1)
@@ -341,13 +344,13 @@ PARAM_ADD(PARAM_UINT32 | PARAM_RONLY, id1, MCU_ID_ADDRESS+4)
 PARAM_ADD(PARAM_UINT32 | PARAM_RONLY, id2, MCU_ID_ADDRESS+8)
 PARAM_GROUP_STOP(cpu)*/
 
-PARAM_GROUP_START(system)
-PARAM_ADD(PARAM_INT8 | PARAM_RONLY, selftestPassed, &selftestPassed)
-PARAM_ADD(PARAM_INT8, forceArm, &forceArm)
-PARAM_GROUP_STOP(sytem)
+// PARAM_GROUP_START(system)
+// PARAM_ADD(PARAM_INT8 | PARAM_RONLY, selftestPassed, &selftestPassed)
+// PARAM_ADD(PARAM_INT8, forceArm, &forceArm)
+// PARAM_GROUP_STOP(sytem)
 
 /* Loggable variables */
-LOG_GROUP_START(sys)
-LOG_ADD(LOG_INT8, canfly, &canFly)
-LOG_ADD(LOG_INT8, armed, &armed)
-LOG_GROUP_STOP(sys)
+// LOG_GROUP_START(sys)
+// LOG_ADD(LOG_INT8, canfly, &canFly)
+// LOG_ADD(LOG_INT8, armed, &armed)
+// LOG_GROUP_STOP(sys)
