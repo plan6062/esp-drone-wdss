@@ -140,9 +140,9 @@ int tcp_connect_to_server(void)
 
 void set_motor_speed(uint8_t speed_percent)
 {
-    // 안전을 위해 최대 8%로 제한 (매우 낮춤)
-    if (speed_percent > 8) {
-        speed_percent = 8;
+    // 안전을 위해 최대 15%로 제한
+    if (speed_percent > 15) {
+        speed_percent = 15;
     }
 
     uint16_t motor_ratio = (uint16_t)(speed_percent * 655);
@@ -185,20 +185,66 @@ void process_json_command(const char* json_str)
 
         printf("RGB: (%d,%d,%d)\n", red, green, blue);
 
-        // RGB 값에 따라 LED 제어 (가장 높은 값의 색상)
+        // RGB 값에 따라 LED 제어 (중복 방지 로직 포함)
+        static int last_led_color = -1; // -1: none, 0: RED, 1: GREEN, 2: BLUE
+
         ledClearAll();
-        if (red >= green && red >= blue && red >= 128) {
-            ledSet(LED_RED, true);
-            printf("LED: RED\n");
-        } else if (green >= red && green >= blue && green >= 128) {
-            ledSet(LED_GREEN, true);
-            printf("LED: GREEN\n");
-        } else if (blue >= red && blue >= green && blue >= 128) {
-            ledSet(LED_BLUE, true);
-            printf("LED: BLUE\n");
+
+        // RGB 값을 크기 순으로 정렬하여 우선순위 결정
+        int current_led_color;
+
+        if (red == 0 && green == 0 && blue == 0) {
+            // 모든 값이 0이면 기본으로 RED 표시
+            current_led_color = 0;
+        } else if (red >= green && red >= blue) {
+            current_led_color = 0; // RED 우선순위
+        } else if (green >= blue) {
+            current_led_color = 1; // GREEN 우선순위
         } else {
-            printf("LED: OFF\n");
+            current_led_color = 2; // BLUE 우선순위
         }
+
+        // 이전과 같은 색상이면 다음 우선순위 색상으로 변경
+        if (current_led_color == last_led_color) {
+            if (red > 0 && green > 0 && blue > 0) {
+                // 세 값 모두 0이 아닌 경우에만 대체 색상 선택
+                if (current_led_color == 0 && green >= blue) current_led_color = 1;      // RED → GREEN
+                else if (current_led_color == 0) current_led_color = 2;                  // RED → BLUE
+                else if (current_led_color == 1 && red >= blue) current_led_color = 0;   // GREEN → RED
+                else if (current_led_color == 1) current_led_color = 2;                  // GREEN → BLUE
+                else if (current_led_color == 2 && red >= green) current_led_color = 0;  // BLUE → RED
+                else current_led_color = 1;                                              // BLUE → GREEN
+            }
+        }
+
+        // LED 설정 및 출력
+        switch(current_led_color) {
+            case 0:
+                ledSet(LED_RED, true);
+                printf("LED: RED");
+                break;
+            case 1:
+                ledSet(LED_GREEN, true);
+                printf("LED: GREEN");
+                break;
+            case 2:
+                ledSet(LED_BLUE, true);
+                printf("LED: BLUE");
+                break;
+        }
+
+        // 중복 방지 로깅
+        if (current_led_color == last_led_color) {
+            printf(" (same as last)\n");
+        } else if (last_led_color != -1) {
+            printf(" (changed from %s)\n",
+                   last_led_color == 0 ? "RED" :
+                   last_led_color == 1 ? "GREEN" : "BLUE");
+        } else {
+            printf("\n");
+        }
+
+        last_led_color = current_led_color;
     }
 
     // 모터 제어

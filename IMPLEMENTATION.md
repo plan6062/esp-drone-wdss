@@ -33,21 +33,22 @@ Frontend + Backend                    GCS Server                          ESP32-
 
 #### 1.2 핵심 컴포넌트
 ```c
-// main/main.c - 메인 애플리케이션
+// main/main.c - 통합 애플리케이션 (단일 파일 구조)
 - WiFi Station 모드 초기화
 - TCP 클라이언트 연결
 - JSON 명령 파싱 및 실행
-- LED RGB 제어 (Red/Green/Blue 단순화)
+- LED RGB 제어 (Red/Green/Blue, 항상 표시)
 - 모터 속도 제어 (안전을 위해 최대 8% 제한)
-
-// components/gcs_comm/gcs_comm.c - 통신 컴포넌트 (미사용)
-- 초기 WebSocket 통신 시도용
-- 현재는 main.c에서 직접 TCP 처리
+- 연결 모니터링 및 자동 재연결
 
 // config.h - 환경 설정 (Git 제외)
 - WiFi SSID/Password
 - 서버 IP 주소
 - 환경별 설정 분리
+
+// CMakeLists.txt - 의존성 관리
+- driver, led, motors, esp_wifi, nvs_flash, json
+- 컴파일 에러 방지를 위한 최적화된 의존성 구조
 ```
 
 #### 1.3 네트워크 설정
@@ -75,14 +76,18 @@ Frontend + Backend                    GCS Server                          ESP32-
 
 #### 1.5 LED 제어 로직
 ```c
-// RGB 값에 따라 단일 색상 LED 제어
-if (red >= green && red >= blue && red >= 128) {
+// RGB 값에 따라 단일 색상 LED 제어 (항상 표시)
+if (red == 0 && green == 0 && blue == 0) {
+    // 모든 값이 0이면 기본으로 RED 표시
+    ledSet(LED_RED, true);
+} else if (red >= green && red >= blue) {
     ledSet(LED_RED, true);      // 빨간색 LED
-} else if (green >= red && green >= blue && green >= 128) {
+} else if (green >= blue) {
     ledSet(LED_GREEN, true);    // 초록색 LED
-} else if (blue >= red && blue >= green && blue >= 128) {
+} else {
     ledSet(LED_BLUE, true);     // 파란색 LED
 }
+// 주요 개선: 128 임계값 제거로 LED OFF 상황 완전 제거
 ```
 
 ### 2. GCS 서버 (C# ASP.NET Core)
@@ -178,6 +183,9 @@ idf.py monitor
 - **WiFi 호환성**: 5GHz → 2.4GHz WiFi 환경 확인
 - **네트워크 통신**: WebSocket → TCP 변경 (NAT 문제 해결)
 - **컴파일 에러**: stringop-overflow 경고 처리
+- **아키텍처 단순화**: gcs_comm 컴포넌트 완전 제거, main.c 단일 파일 구조로 변경
+- **의존성 최적화**: CMakeLists.txt driver 의존성 추가로 빌드 에러 해결
+- **LED 제어 개선**: 항상 LED 표시되도록 로직 개선 (OFF 상황 제거)
 
 ### 2. 보안 문제
 - **민감한 정보**: WiFi 정보를 config.h로 분리
@@ -261,6 +269,9 @@ if (activity == 0) {
 - ✅ WiFi 설정 분리 및 Git 보안 관리 (config.h 시스템)
 - ✅ WebSocket → TCP 프로토콜 변경으로 NAT 문제 해결
 - ✅ 메모리 최적화 (9000 bytes 오버플로우 → 189KB 바이너리)
+- ✅ 아키텍처 단순화: gcs_comm 컴포넌트 제거, main.c 단일 파일 구조
+- ✅ LED 제어 로직 개선: 항상 LED 표시 보장 (OFF 상황 완전 제거)
+- ✅ 빌드 시스템 최적화: CMakeLists.txt 의존성 구조 개선
 
 이 시스템은 향후 대규모 드론쇼나 교육용 드론 플랫폼으로 확장할 수 있는
 견고한 기반을 제공합니다.
