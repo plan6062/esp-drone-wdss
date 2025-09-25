@@ -5,6 +5,8 @@ cmake_minimum_required(VERSION 3.5)
 set(__PROJECT_GROUP_LINK_COMPONENTS ON)
 
 set(PLANE_COMPONENT_DIRS "./components/core"
+                        "./components/drivers/i2c_bus"
+                        "./components/drivers/i2c_devices/mpu6050"
                         "./components/drivers/general"
                          "./components/lib" )
 

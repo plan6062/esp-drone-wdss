@@ -3,7 +3,8 @@
     "allow": [
       "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/DroneShow/GCSServer/**)",
       "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/WDSS-web/**)",
-      "Bash(idf.py build:*)"
+      "Bash(idf.py build:*)",
+      "Read(//c/Users/qwa78/OneDrive/Desktop/Krafton-Jungle/original_esp_drone/esp-drone/**)"
     ],
     "deny": [],
     "ask": []
